@@ -137,8 +137,11 @@
     function Moment(date, isUTC) {
         this._d = date;
         this._isUTC = !!isUTC;
-        this._a = date._a || null;
-        date._a = null;
+        if (date._a) {
+            this._a = date._a;
+            date._a = null;
+            this._ac = (this._a[7] ? moment.utc(this) : this).toArray();
+        }
     }
 
     // Duration Constructor
@@ -777,8 +780,8 @@
         },
 
         isValid : function () {
-            if (this._a) {
-                return !compareArrays(this._a, (this._a[7] ? moment.utc(this) : this).toArray());
+            if (this._a && this._ac) {
+                return !compareArrays(this._a, this._ac);
             }
             return !isNaN(this._d.getTime());
         },
